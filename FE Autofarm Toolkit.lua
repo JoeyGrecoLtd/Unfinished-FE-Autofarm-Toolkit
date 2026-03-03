@@ -10,8 +10,8 @@ screenGui.Name = "AutofarmToolkit"
 screenGui.Parent = CoreGui
 
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 420, 0, 580)
-mainFrame.Position = UDim2.new(0.5, -210, 0.5, -290)
+mainFrame.Size = UDim2.new(0, 420, 0, 600)
+mainFrame.Position = UDim2.new(0.5, -210, 0.5, -300)
 mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
 mainFrame.BorderSizePixel = 0
 mainFrame.Active = true
@@ -19,13 +19,38 @@ mainFrame.Draggable = true
 mainFrame.Parent = screenGui
 
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 35)
+title.Size = UDim2.new(1, -40, 0, 35)
+title.Position = UDim2.new(0, 0, 0, 0)
 title.BackgroundTransparency = 1
 title.Text = "FE Autofarm Toolkit"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.SourceSansBold
 title.TextSize = 22
 title.Parent = mainFrame
+
+local noteLabel = Instance.new("TextLabel")
+noteLabel.Size = UDim2.new(1, -40, 0, 18)
+noteLabel.Position = UDim2.new(0, 0, 0, 33)
+noteLabel.BackgroundTransparency = 1
+noteLabel.Text = "use with explorer"
+noteLabel.TextColor3 = Color3.new(0.6, 0.6, 0.6)
+noteLabel.Font = Enum.Font.SourceSansItalic
+noteLabel.TextSize = 14
+noteLabel.Parent = mainFrame
+
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Size = UDim2.new(0, 30, 0, 30)
+toggleBtn.Position = UDim2.new(1, -35, 0, 5)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 55)
+toggleBtn.Text = "-"
+toggleBtn.TextColor3 = Color3.new(1, 1, 1)
+toggleBtn.Font = Enum.Font.SourceSansBold
+toggleBtn.TextSize = 20
+toggleBtn.Parent = mainFrame
+
+local isExpanded = true
+local originalSize = UDim2.new(0, 420, 0, 600)
+local collapsedSize = UDim2.new(0, 420, 0, 55)
 
 local function createCheckbox(parent, position)
     local checkbox = Instance.new("TextButton")
@@ -37,20 +62,20 @@ local function createCheckbox(parent, position)
     checkbox.Font = Enum.Font.SourceSansBold
     checkbox.TextSize = 16
     checkbox.Parent = parent
-
+    
     local checked = false
     checkbox.MouseButton1Click:Connect(function()
         checked = not checked
         checkbox.Text = checked and "X" or ""
         checkbox.BackgroundColor3 = checked and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(55, 55, 60)
     end)
-
+    
     return checkbox, function() return checked end
 end
 
 local touchFrame = Instance.new("Frame")
 touchFrame.Size = UDim2.new(1, -20, 0, 150)
-touchFrame.Position = UDim2.new(0, 10, 0, 45)
+touchFrame.Position = UDim2.new(0, 10, 0, 55)
 touchFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
 touchFrame.Parent = mainFrame
 
@@ -151,7 +176,7 @@ touchStatus.Parent = touchFrame
 
 local promptFrame = Instance.new("Frame")
 promptFrame.Size = UDim2.new(1, -20, 0, 150)
-promptFrame.Position = UDim2.new(0, 10, 0, 205)
+promptFrame.Position = UDim2.new(0, 10, 0, 215)
 promptFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
 promptFrame.Parent = mainFrame
 
@@ -252,7 +277,7 @@ promptStatus.Parent = promptFrame
 
 local clickFrame = Instance.new("Frame")
 clickFrame.Size = UDim2.new(1, -20, 0, 150)
-clickFrame.Position = UDim2.new(0, 10, 0, 365)
+clickFrame.Position = UDim2.new(0, 10, 0, 375)
 clickFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
 clickFrame.Parent = mainFrame
 
@@ -353,7 +378,7 @@ clickStatus.Parent = clickFrame
 
 local globalFrame = Instance.new("Frame")
 globalFrame.Size = UDim2.new(1, -20, 0, 60)
-globalFrame.Position = UDim2.new(0, 10, 0, 525)
+globalFrame.Position = UDim2.new(0, 10, 0, 535)
 globalFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 45)
 globalFrame.Parent = mainFrame
 
@@ -387,6 +412,25 @@ globalStopBtn.Font = Enum.Font.SourceSansBold
 globalStopBtn.TextSize = 16
 globalStopBtn.Parent = globalFrame
 
+toggleBtn.MouseButton1Click:Connect(function()
+    isExpanded = not isExpanded
+    if isExpanded then
+        mainFrame.Size = originalSize
+        toggleBtn.Text = "-"
+        touchFrame.Visible = true
+        promptFrame.Visible = true
+        clickFrame.Visible = true
+        globalFrame.Visible = true
+    else
+        mainFrame.Size = collapsedSize
+        toggleBtn.Text = "+"
+        touchFrame.Visible = false
+        promptFrame.Visible = false
+        clickFrame.Visible = false
+        globalFrame.Visible = false
+    end
+end)
+
 local touchActive = false
 local promptActive = false
 local clickActive = false
@@ -401,11 +445,11 @@ end
 
 local function fireTouchInterest(part)
     if not part or not rootPart then return end
-
+    
     local oldPosition = rootPart.CFrame
     rootPart.CFrame = part.CFrame + Vector3.new(0, 2, 0)
     wait(0.1)
-
+    
     if firetouchinterest then
         firetouchinterest(part, rootPart, 1)
         wait(0.05)
@@ -413,13 +457,13 @@ local function fireTouchInterest(part)
     else
         part.CFrame = rootPart.CFrame
     end
-
+    
     rootPart.CFrame = oldPosition
 end
 
 local function fireProximityPrompt(prompt)
     if not prompt then return end
-
+    
     if fireproximityprompt then
         fireproximityprompt(prompt)
     end
@@ -427,7 +471,7 @@ end
 
 local function fireClickDetector(detector)
     if not detector then return end
-
+    
     if fireclickdetector then
         fireclickdetector(detector)
     end
@@ -441,18 +485,18 @@ local function startTouch()
     if touchActive then return end
     touchActive = true
     updateStatus(touchStatus, "Running...")
-
+    
     local delay = tonumber(touchDelayBox.Text) or 1
-
+    
     touchConnection = RunService.Heartbeat:Connect(function()
         if not touchActive then return end
-
+        
         local character = player.Character
         if not character then return end
-
+        
         rootPart = getRoot(character)
         if not rootPart then return end
-
+        
         local touchName = touchNameBox.Text
         if touchName ~= "" then
             local useParentMode = touchGetParentMode()
@@ -470,7 +514,7 @@ local function startTouch()
                 end
             end
         end
-
+        
         wait(delay)
     end)
 end
@@ -488,12 +532,12 @@ local function startPrompt()
     if promptActive then return end
     promptActive = true
     updateStatus(promptStatus, "Running...")
-
+    
     local delay = tonumber(promptDelayBox.Text) or 1
-
+    
     promptConnection = RunService.Heartbeat:Connect(function()
         if not promptActive then return end
-
+        
         local promptName = promptNameBox.Text
         if promptName ~= "" then
             local useParentMode = promptGetParentMode()
@@ -511,7 +555,7 @@ local function startPrompt()
                 end
             end
         end
-
+        
         wait(delay)
     end)
 end
@@ -529,12 +573,12 @@ local function startClick()
     if clickActive then return end
     clickActive = true
     updateStatus(clickStatus, "Running...")
-
+    
     local delay = tonumber(clickDelayBox.Text) or 1
-
+    
     clickConnection = RunService.Heartbeat:Connect(function()
         if not clickActive then return end
-
+        
         local clickName = clickNameBox.Text
         if clickName ~= "" then
             local useParentMode = clickGetParentMode()
@@ -552,7 +596,7 @@ local function startClick()
                 end
             end
         end
-
+        
         wait(delay)
     end)
 end
